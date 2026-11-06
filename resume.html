@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>小熊｜全端軟體開發工程師</title>
+<meta name="description" content="小熊，全端軟體開發工程師。前端 Angular / Vue，後端 C# / .NET，並以 n8n 建立自動化流程。">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+/* ============ Tokens（取自 DESIGN-bmw-m.md） ============ */
+:root {
+  --canvas: #000000;
+  --surface-soft: #0d0d0d;
+  --surface-card: #1a1a1a;
+  --surface-elevated: #262626;
+  --carbon-gray: #2b2b2b;
+  --hairline: #3c3c3c;
+  --ink: #ffffff;
+  --body-strong: #e6e6e6;
+  --body: #bbbbbb;
+  --muted: #7e7e7e;
+  --m-blue-light: #0066b1;
+  --m-blue-dark: #1c69d4;
+  --m-red: #e22718;
+
+  --font: "BMWTypeNextLatin", "Inter", "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", "PingFang TC", Roboto, sans-serif;
+
+  --sp-xxs: 4px; --sp-xs: 8px; --sp-sm: 12px; --sp-md: 16px;
+  --sp-lg: 24px; --sp-xl: 40px; --sp-xxl: 64px; --sp-section: 96px;
+
+  --gutter: clamp(20px, 4vw, 64px);
+  --nav-h: 64px;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--nav-h) + 16px); }
+body {
+  margin: 0;
+  background: var(--canvas);
+  color: var(--body);
+  font-family: var(--font);
+  font-weight: 300;
+  font-size: 16px;
+  line-height: 1.7;           /* 中文內文行高略放寬 */
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4, p, ul, ol, figure { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+svg { display: block; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+.wrap { width: 100%; max-width: 1440px; margin: 0 auto; padding: 0 var(--gutter); }
+
+/* ============ 共用元件 ============ */
+.display {
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--ink);
+  letter-spacing: -0.5px;      /* 以 Inter 替代時依規範收緊字距 */
+}
+.label {
+  font-size: 14px; font-weight: 700; line-height: 1.3;
+  letter-spacing: 1.5px; text-transform: uppercase;
+}
+.caption { font-size: 12px; font-weight: 400; letter-spacing: .5px; line-height: 1.4; }
+
+.m-stripe {
+  display: block; height: 4px; width: 100%;
+  background: linear-gradient(90deg,
+    var(--m-blue-light) 0 33.333%,
+    var(--m-blue-dark) 33.333% 66.666%,
+    var(--m-red) 66.666% 100%);
+}
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  height: 48px; padding: 0 32px;
+  border: 1px solid var(--ink); border-radius: 0;
+  background: transparent; color: var(--ink);
+  font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; line-height: 1;
+  transition: background-color .15s, color .15s;
+}
+.btn:hover { background: var(--ink); color: var(--canvas); }
+
+.text-link {
+  display: inline-flex; align-items: center; gap: 10px; min-height: 48px;
+  font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--ink);
+}
+.text-link::after { content: "\2192"; }
+
+.band { padding: var(--sp-section) 0; }
+.band--soft { background: var(--surface-soft); }
+
+.sec-head { margin-bottom: var(--sp-xxl); max-width: 900px; }
+.sec-head h2 { font-size: clamp(36px, 5vw, 56px); line-height: 1.05; }
+.sec-head p { margin-top: var(--sp-md); font-size: 18px; font-weight: 400; color: var(--body); }
+
+/* ============ 頂部導覽 ============ */
+.top-nav {
+  position: sticky; top: 0; z-index: 50;
+  height: var(--nav-h);
+  background: var(--canvas);
+  border-bottom: 1px solid var(--hairline-strong, #262626);
+}
+.top-nav .wrap { height: 100%; display: flex; align-items: center; justify-content: space-between; gap: var(--sp-lg); }
+.brand { display: inline-flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 700; font-size: 18px; }
+.brand-mark { display: inline-flex; gap: 3px; }
+.brand-mark i { width: 6px; height: 18px; transform: skewX(-20deg); }
+.brand-mark i:nth-child(1) { background: var(--m-blue-light); }
+.brand-mark i:nth-child(2) { background: var(--m-blue-dark); }
+.brand-mark i:nth-child(3) { background: var(--m-red); }
+
+.nav-links { display: flex; align-items: center; gap: 32px; }
+.nav-links a {
+  position: relative; display: inline-flex; align-items: center; height: var(--nav-h);
+  font-size: 14px; font-weight: 400; letter-spacing: .5px; color: var(--body);
+}
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 4px;
+  background: linear-gradient(90deg, var(--m-blue-light) 0 33.333%, var(--m-blue-dark) 33.333% 66.666%, var(--m-red) 66.666% 100%);
+  transform: scaleX(0); transform-origin: left; transition: transform .2s;
+}
+.nav-links a:hover, .nav-links a[aria-current="true"] { color: var(--ink); }
+.nav-links a:hover::after, .nav-links a[aria-current="true"]::after { transform: scaleX(1); }
+
+.nav-toggle {
+  display: none; width: 48px; height: 48px; border-radius: 9999px;
+  background: var(--surface-card); align-items: center; justify-content: center;
+}
+.nav-toggle span, .nav-toggle span::before, .nav-toggle span::after {
+  display: block; width: 18px; height: 2px; background: var(--ink); position: relative; content: "";
+}
+.nav-toggle span::before { position: absolute; top: -6px; }
+.nav-toggle span::after { position: absolute; top: 6px; }
+.nav-toggle[aria-expanded="true"] span { background: transparent; }
+.nav-toggle[aria-expanded="true"] span::before { top: 0; transform: rotate(45deg); }
+.nav-toggle[aria-expanded="true"] span::after { top: 0; transform: rotate(-45deg); }
+
+.nav-sheet {
+  position: fixed; inset: var(--nav-h) 0 0 0; z-index: 40;
+  background: var(--canvas); padding: 0 var(--gutter) var(--sp-xl);
+  display: none; flex-direction: column;
+}
+.nav-sheet.is-open { display: flex; }
+.nav-sheet a {
+  padding: var(--sp-lg) 0; border-bottom: 1px solid var(--hairline);
+  font-size: 32px; font-weight: 700; text-transform: uppercase; color: var(--ink); line-height: 1.15;
+}
+.nav-sheet a small { display: block; font-size: 14px; font-weight: 300; text-transform: none; color: var(--body); letter-spacing: 0; }
+
+/* ============ Hero ============ */
+.hero {
+  position: relative; overflow: hidden;
+  min-height: min(68vh, 640px);
+  display: flex; align-items: flex-end;
+  padding: var(--sp-section) 0 var(--sp-xxl);
+}
+.hero-role { color: var(--body-strong); margin-bottom: var(--sp-lg); }
+.hero h1 { font-size: clamp(44px, 8.4vw, 120px); line-height: 1; }
+.hero-lead { margin-top: var(--sp-xl); max-width: 36em; font-size: 20px; font-weight: 400; line-height: 1.6; color: var(--body-strong); }
+.hero-actions { margin-top: var(--sp-xl); display: flex; flex-wrap: wrap; align-items: center; gap: var(--sp-lg); }
+
+.hero-stripe { transform-origin: left; animation: draw 1.1s cubic-bezier(.2,.7,.2,1) both; }
+@keyframes draw { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+/* ============ Spec strip ============ */
+.spec-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--hairline); border: 1px solid var(--hairline); }
+.spec-cell { background: var(--surface-soft); padding: var(--sp-xl) var(--sp-lg); }
+.spec-value { font-size: clamp(22px, 2.3vw, 32px); font-weight: 700; line-height: 1.15; color: var(--ink); text-transform: uppercase; overflow-wrap: anywhere; }
+.spec-label { margin-top: var(--sp-sm); color: var(--body); }
+
+/* ============ Tech stack tabs ============ */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px 32px; border-bottom: 1px solid var(--hairline); margin-bottom: var(--sp-xl); }
+.tab {
+  position: relative; padding: 12px 0; min-height: 44px;
+  color: var(--body); font-size: 14px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+}
+.tab[aria-selected="true"] { color: var(--ink); }
+.tab[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--ink); }
+.tab:hover { color: var(--ink); }
+
+.stack-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-lg); }
+.stack-group { background: var(--canvas); border: 1px solid var(--hairline); padding: var(--sp-xl); }
+.stack-group[hidden] { display: none; }
+.stack-group h3 { font-size: 24px; line-height: 1.3; font-weight: 700; color: var(--ink); text-transform: uppercase; }
+.stack-group h3 span { display: block; margin-top: 2px; font-size: 16px; font-weight: 300; text-transform: none; color: var(--body); }
+.stack-group p { margin-top: var(--sp-md); max-width: 34em; }
+.chips { margin-top: var(--sp-lg); display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { padding: 6px 12px; border: 1px solid var(--hairline); color: var(--body-strong); font-size: 14px; font-weight: 400; line-height: 1.4; }
+.stack-grid.is-single { grid-template-columns: minmax(0, 720px); }
+
+/* ============ Work cards ============ */
+.card-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-lg); }
+.feature-card { background: var(--surface-card); padding: var(--sp-xl) var(--sp-lg); display: flex; flex-direction: column; min-height: 320px; }
+.feature-card .label { color: var(--body); }
+.feature-card h3 { margin-top: auto; padding-top: var(--sp-xxl); font-size: 24px; line-height: 1.3; font-weight: 700; color: var(--ink); }
+.feature-card p { margin-top: var(--sp-sm); }
+
+/* ============ Automation ============ */
+.auto-layout { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--sp-xxl); align-items: start; }
+.auto-layout .sec-head { margin-bottom: 0; }
+.auto-list { border-top: 1px solid var(--hairline); }
+.auto-row { display: flex; align-items: center; justify-content: space-between; gap: var(--sp-lg); padding: var(--sp-lg) 0; border-bottom: 1px solid var(--hairline); }
+.auto-row h3 { font-size: 24px; line-height: 1.3; font-weight: 700; color: var(--ink); }
+.auto-row p { margin-top: 2px; font-size: 14px; color: var(--body); }
+.tag { flex: none; padding: 6px 12px; border: 1px solid var(--hairline); font-size: 12px; font-weight: 700; letter-spacing: 1.5px; color: var(--body-strong); }
+
+/* ============ Accessibility band ============ */
+.a11y { background: var(--carbon-gray); }
+.a11y-layout { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 6fr); gap: var(--sp-xxl); align-items: end; }
+.a11y-big { font-size: clamp(64px, 12vw, 168px); line-height: .95; }
+.a11y .label { color: var(--body-strong); margin-bottom: var(--sp-md); }
+.a11y h2 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; }
+.a11y p { margin-top: var(--sp-md); max-width: 32em; color: var(--body-strong); }
+
+/* ============ Projects ============ */
+.model-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp-xl) var(--sp-lg); }
+.model-visual { aspect-ratio: 16 / 10; background: var(--surface-card); overflow: hidden; }
+.model-visual svg { width: 100%; height: 100%; }
+.model-card .label { margin-top: var(--sp-lg); color: var(--body); }
+.model-card h3 { margin-top: var(--sp-xs); font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; }
+.model-card .zh { margin-top: var(--sp-xs); font-size: 20px; font-weight: 400; color: var(--body-strong); }
+.model-card p.desc { margin-top: var(--sp-sm); max-width: 32em; }
+
+/* ============ 結尾 CTA ============ */
+.cta { text-align: center; padding: 80px 0; background: var(--surface-soft); }
+.cta h2 { font-size: clamp(32px, 4.4vw, 56px); line-height: 1.05; }
+.cta p { margin: var(--sp-lg) auto var(--sp-xl); max-width: 30em; font-size: 18px; font-weight: 400; color: var(--body-strong); }
+
+/* ============ Footer ============ */
+.footer { background: var(--canvas); padding: 0 0 var(--sp-xl); }
+.footer-inner { padding-top: var(--sp-xl); display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-md); font-size: 14px; color: var(--body); }
+.footer .caption { color: var(--muted); }
+
+/* ============ 響應式 ============ */
+@media (max-width: 1023px) {
+  .spec-grid { grid-template-columns: repeat(2, 1fr); }
+  .card-grid { grid-template-columns: repeat(2, 1fr); }
+  .card-grid .feature-card:last-child { grid-column: 1 / -1; min-height: 0; }
+  .auto-layout, .a11y-layout { grid-template-columns: 1fr; gap: var(--sp-xl); }
+}
+@media (max-width: 767px) {
+  :root { --sp-section: 64px; }
+  .nav-links { display: none; }
+  .nav-toggle { display: inline-flex; }
+  .hero { min-height: 0; padding: 64px 0 40px; }
+  .hero-lead { font-size: 18px; }
+  .stack-grid, .card-grid, .model-grid { grid-template-columns: 1fr; }
+  .stack-grid.is-single { grid-template-columns: 1fr; }
+  .stack-group { padding: var(--sp-lg); }
+  .feature-card { min-height: 0; }
+  .feature-card h3 { padding-top: var(--sp-xl); }
+  .auto-row { flex-direction: column; align-items: flex-start; gap: var(--sp-sm); }
+  .sec-head { margin-bottom: var(--sp-xl); }
+  .tabs { gap: 0 24px; }
+}
+@media (max-width: 479px) {
+  .spec-grid { grid-template-columns: 1fr; }
+  .spec-cell { padding: var(--sp-lg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-stripe { animation: none; }
+  * { transition: none !important; }
+}
+
+/* ============ 列印 / 另存 PDF ============ */
+@media print {
+  @page { margin: 12mm; }
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .top-nav, .nav-sheet, .hero-actions, .cta .btn, .tabs, .footer .text-link { display: none !important; }
+  .hero { min-height: 0; padding: 32px 0; }
+  .band { padding: 40px 0; }
+  .stack-group[hidden] { display: block !important; }
+  .hero-stripe { animation: none; }
+  section, .feature-card, .stack-group, .model-card, .auto-row { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+
+<header class="top-nav">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="小熊，回到頁首">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      小熊
+    </a>
+    <nav class="nav-links" aria-label="主要導覽">
+      <a href="#stack">Stack</a>
+      <a href="#work">Work</a>
+      <a href="#automation">Automation</a>
+      <a href="#projects">Projects</a>
+    </nav>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-sheet" aria-label="開啟選單"><span></span></button>
+  </div>
+</header>
+
+<nav class="nav-sheet" id="nav-sheet" aria-label="行動版導覽">
+  <span class="m-stripe" aria-hidden="true"></span>
+  <a href="#stack">Stack <small>技術堆疊</small></a>
+  <a href="#work">Work <small>工作內容</small></a>
+  <a href="#automation">Automation <small>自動化與工具建置</small></a>
+  <a href="#projects">Projects <small>個人專案</small></a>
+</nav>
+
+<main id="top">
+
+  <!-- Hero -->
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
+      <p class="label hero-role">小熊 / 全端軟體開發工程師</p>
+      <h1 class="display" id="hero-title">Built to be<br>maintained.</h1>
+      <p class="hero-lead">日常工作同時涵蓋前端與後端，橫跨企業級網站的介面實作與伺服器端的系統開發。</p>
+      <div class="hero-actions">
+        <a class="btn" href="#stack">查看技術</a>
+        <button class="text-link" type="button" data-print>另存為 PDF</button>
+      </div>
+    </div>
+  </section>
+  <span class="m-stripe hero-stripe" aria-hidden="true"></span>
+
+  <!-- Spec strip -->
+  <section class="band band--soft" style="padding:var(--sp-xxl) 0" aria-label="技能摘要">
+    <div class="wrap">
+      <div class="spec-grid">
+        <div class="spec-cell"><p class="spec-value">TypeScript</p><p class="spec-label label">前端 / Front-end</p></div>
+        <div class="spec-cell"><p class="spec-value">C# / .NET</p><p class="spec-label label">後端 / Back-end</p></div>
+        <div class="spec-cell"><p class="spec-value">Oracle SQL</p><p class="spec-label label">資料庫 / Database</p></div>
+        <div class="spec-cell"><p class="spec-value">n8n</p><p class="spec-label label">自動化 / Automation</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech stack -->
+  <section class="band" id="stack" aria-labelledby="stack-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="display" id="stack-title">Tech stack.</h2>
+        <p>技術堆疊。前端與後端並行，大型專案也能保持結構清楚、易於協作。</p>
+      </div>
+
+      <div class="tabs" role="tablist" aria-label="技術分類">
+        <button class="tab" role="tab" id="tab-all" aria-selected="true" aria-controls="stack-panel" data-filter="all">All</button>
+        <button class="tab" role="tab" id="tab-front" aria-selected="false" aria-controls="stack-panel" data-filter="front" tabindex="-1">Front-end</button>
+        <button class="tab" role="tab" id="tab-back" aria-selected="false" aria-controls="stack-panel" data-filter="back" tabindex="-1">Back-end</button>
+        <button class="tab" role="tab" id="tab-db" aria-selected="false" aria-controls="stack-panel" data-filter="db" tabindex="-1">Database</button>
+        <button class="tab" role="tab" id="tab-auto" aria-selected="false" aria-controls="stack-panel" data-filter="auto" tabindex="-1">Automation</button>
+      </div>
+
+      <div class="stack-grid" id="stack-panel" role="tabpanel" aria-labelledby="tab-all">
+        <article class="stack-group" data-group="front">
+          <h3>Front-end <span>前端</span></h3>
+          <p>以 Angular 與 Vue 開發應用，樣式用 SCSS 搭配 BEM 命名規範維護。建置流程以 Gulp 處理模板、樣式與圖片最佳化，並用 ESLint、Babel 維持程式品質。</p>
+          <ul class="chips" aria-label="前端技術">
+            <li class="chip">TypeScript</li><li class="chip">JavaScript</li><li class="chip">Angular</li><li class="chip">Vue</li>
+            <li class="chip">SCSS</li><li class="chip">BEM</li><li class="chip">Gulp</li><li class="chip">ESLint</li><li class="chip">Babel</li><li class="chip">plupload</li>
+          </ul>
+        </article>
+
+        <article class="stack-group" data-group="back">
+          <h3>Back-end <span>後端</span></h3>
+          <p>以 C# 與 .NET 生態系為主：從 .NET Framework 4.8、ASP.NET MVC 與 Razor 視圖，到較新的 .NET Core、EF Core 與 LINQ。也有 Java 的開發經驗。</p>
+          <ul class="chips" aria-label="後端技術">
+            <li class="chip">C#</li><li class="chip">.NET Framework 4.8</li><li class="chip">ASP.NET MVC</li><li class="chip">Razor</li>
+            <li class="chip">.NET Core</li><li class="chip">EF Core</li><li class="chip">LINQ</li><li class="chip">Java</li>
+          </ul>
+        </article>
+
+        <article class="stack-group" data-group="db">
+          <h3>Database <span>資料庫</span></h3>
+          <p>熟悉 Oracle SQL 與 SQL Server。</p>
+          <ul class="chips" aria-label="資料庫技術">
+            <li class="chip">Oracle SQL</li><li class="chip">SQL Server</li>
+          </ul>
+        </article>
+
+        <article class="stack-group" data-group="auto">
+          <h3>Automation <span>自動化與檢測</span></h3>
+          <p>用 n8n 建立排程流程，並持續探索如何結合 Claude API 與瀏覽器自動化，讓重複性工作更有效率。</p>
+          <ul class="chips" aria-label="自動化技術">
+            <li class="chip">n8n</li><li class="chip">Claude API</li><li class="chip">瀏覽器自動化</li><li class="chip">WCAG AA</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work -->
+  <section class="band band--soft" id="work" aria-labelledby="work-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="display" id="work-title">What I build.</h2>
+        <p>工作內容。表單密集的網頁應用與文件管理功能，在金融服務等企業環境中相當常見。</p>
+      </div>
+      <div class="card-grid">
+        <article class="feature-card">
+          <p class="label">Form-heavy apps</p>
+          <h3>表單密集的網頁應用</h3>
+          <p>實作表單流程與報表產出，從介面一路做到伺服器端。</p>
+        </article>
+        <article class="feature-card">
+          <p class="label">Document management</p>
+          <h3>文件管理功能</h3>
+          <p>使用 plupload 實作多檔案上傳。</p>
+        </article>
+        <article class="feature-card">
+          <p class="label">Enterprise websites</p>
+          <h3>企業級網站</h3>
+          <p>前端以 Angular、Vue 實作介面，後端以 C# 與 .NET 開發系統。</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Automation -->
+  <section class="band" id="automation" aria-labelledby="auto-title">
+    <div class="wrap auto-layout">
+      <div class="sec-head">
+        <h2 class="display" id="auto-title">Automate the routine.</h2>
+        <p>自動化與工具建置。近年投入不少時間，把重複性工作交給排程流程。</p>
+      </div>
+      <ul class="auto-list">
+        <li class="auto-row"><h3>前端程式碼檢查</h3><span class="tag">n8n 排程</span></li>
+        <li class="auto-row"><h3>網站 SSL 憑證與網域到期監控</h3><span class="tag">n8n 排程</span></li>
+        <li class="auto-row"><h3>PageSpeed 效能指標擷取</h3><span class="tag">n8n 排程</span></li>
+        <li class="auto-row">
+          <div><h3>Claude API 結合瀏覽器自動化</h3><p>持續探索中，讓重複性工作更有效率。</p></div>
+          <span class="tag">探索中</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Accessibility -->
+  <section class="band a11y" aria-labelledby="a11y-title">
+    <div class="wrap a11y-layout">
+      <p class="display a11y-big" aria-hidden="true">WCAG<br>AA</p>
+      <div>
+        <p class="label">目前關注 / Currently focusing</p>
+        <h2 class="display" id="a11y-title">Accessibility testing.</h2>
+        <p>無障礙網站檢測。依照 WCAG AA 規範，建立可自動產出報表的檢測流程。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="band" id="projects" aria-labelledby="projects-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="display" id="projects-title">Side projects.</h2>
+        <p>個人專案。工作之餘做的作品。</p>
+      </div>
+      <div class="model-grid">
+
+        <article class="model-card">
+          <div class="model-visual" role="img" aria-label="海洋風格介面示意：以藍色波浪線條組成的畫面">
+            <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice" fill="none" stroke-width="2">
+              <rect width="640" height="400" fill="#1a1a1a"/>
+              <path d="M0 120 C 80 80, 160 160, 240 120 S 400 80, 480 120 S 600 160, 640 120" stroke="#0066b1"/>
+              <path d="M0 170 C 80 130, 160 210, 240 170 S 400 130, 480 170 S 600 210, 640 170" stroke="#1c69d4"/>
+              <path d="M0 220 C 80 180, 160 260, 240 220 S 400 180, 480 220 S 600 260, 640 220" stroke="#0066b1"/>
+              <path d="M0 270 C 80 230, 160 310, 240 270 S 400 230, 480 270 S 600 310, 640 270" stroke="#1c69d4"/>
+              <path d="M0 320 C 80 280, 160 360, 240 320 S 400 280, 480 320 S 600 360, 640 320" stroke="#0066b1"/>
+              <rect x="48" y="48" width="132" height="12" fill="#ffffff"/>
+              <rect x="48" y="72" width="84" height="6" fill="#7e7e7e"/>
+            </svg>
+          </div>
+          <p class="label">Personal project</p>
+          <h3 class="display">Seafood info system</h3>
+          <p class="zh">海鮮資訊系統</p>
+          <p class="desc">以海鮮資訊為主題、帶有海洋風格介面的資訊系統。</p>
+        </article>
+
+        <article class="model-card">
+          <div class="model-visual" role="img" aria-label="Axure 原型頁面上的釘選留言與討論串示意">
+            <svg viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice" fill="none">
+              <rect width="640" height="400" fill="#1a1a1a"/>
+              <rect x="48" y="48" width="544" height="304" stroke="#3c3c3c" stroke-width="2"/>
+              <rect x="48" y="48" width="544" height="36" fill="#262626"/>
+              <rect x="72" y="112" width="200" height="104" stroke="#3c3c3c" stroke-width="2"/>
+              <rect x="72" y="240" width="200" height="12" fill="#3c3c3c"/>
+              <rect x="72" y="264" width="140" height="12" fill="#3c3c3c"/>
+              <rect x="296" y="112" width="272" height="12" fill="#3c3c3c"/>
+              <rect x="296" y="136" width="200" height="12" fill="#3c3c3c"/>
+              <circle cx="256" cy="136" r="14" fill="#1c69d4"/>
+              <rect x="316" y="196" width="244" height="132" fill="#000000" stroke="#ffffff" stroke-width="2"/>
+              <rect x="336" y="216" width="150" height="8" fill="#ffffff"/>
+              <rect x="336" y="238" width="196" height="8" fill="#7e7e7e"/>
+              <rect x="352" y="266" width="180" height="8" fill="#7e7e7e"/>
+              <rect x="352" y="288" width="120" height="8" fill="#7e7e7e"/>
+              <path d="M336 262 V 304" stroke="#3c3c3c" stroke-width="2"/>
+            </svg>
+          </div>
+          <p class="label">Chrome extension</p>
+          <h3 class="display">Axure comments</h3>
+          <p class="zh">Axure 原型留言擴充套件</p>
+          <p class="desc">為 Axure 原型頁面開發的 Chrome 擴充套件，具備釘選留言與討論串功能。</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta" aria-labelledby="cta-title">
+    <div class="wrap">
+      <h2 class="display" id="cta-title">Code that lasts.</h2>
+      <p>寫程式不只是完成功能，更重要的是讓系統能被長期維護，也讓使用的人感到順手。</p>
+      <button class="btn" type="button" data-print>另存為 PDF</button>
+    </div>
+  </section>
+
+</main>
+
+<footer class="footer">
+  <span class="m-stripe" aria-hidden="true"></span>
+  <div class="wrap footer-inner">
+    <span>小熊　全端軟體開發工程師</span>
+    <a class="text-link" href="#top">回到頁首</a>
+    <span class="caption">© <span id="year">2026</span> 小熊</span>
+  </div>
+</footer>
+
+<script>
+(function () {
+  // 另存 PDF
+  document.querySelectorAll('[data-print]').forEach(function (b) {
+    b.addEventListener('click', function () { window.print(); });
+  });
+
+  // 行動版選單
+  var toggle = document.querySelector('.nav-toggle');
+  var sheet = document.getElementById('nav-sheet');
+  function setMenu(open) {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? '關閉選單' : '開啟選單');
+    sheet.classList.toggle('is-open', open);
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  toggle.addEventListener('click', function () { setMenu(toggle.getAttribute('aria-expanded') !== 'true'); });
+  sheet.addEventListener('click', function (e) { if (e.target.closest('a')) setMenu(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setMenu(false); });
+  window.matchMedia('(min-width: 768px)').addEventListener('change', function (m) { if (m.matches) setMenu(false); });
+
+  // 技術分類篩選（含方向鍵切換）
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('.tab'));
+  var groups = Array.prototype.slice.call(document.querySelectorAll('.stack-group'));
+  var panel = document.getElementById('stack-panel');
+  function selectTab(tab, focus) {
+    var f = tab.dataset.filter;
+    tabs.forEach(function (t) {
+      var on = t === tab;
+      t.setAttribute('aria-selected', String(on));
+      t.tabIndex = on ? 0 : -1;
+    });
+    groups.forEach(function (g) { g.hidden = !(f === 'all' || g.dataset.group === f); });
+    panel.classList.toggle('is-single', f !== 'all');
+    panel.setAttribute('aria-labelledby', tab.id);
+    if (focus) tab.focus();
+  }
+  tabs.forEach(function (tab, i) {
+    tab.addEventListener('click', function () { selectTab(tab, false); });
+    tab.addEventListener('keydown', function (e) {
+      var n = null;
+      if (e.key === 'ArrowRight') n = tabs[(i + 1) % tabs.length];
+      if (e.key === 'ArrowLeft') n = tabs[(i - 1 + tabs.length) % tabs.length];
+      if (e.key === 'Home') n = tabs[0];
+      if (e.key === 'End') n = tabs[tabs.length - 1];
+      if (n) { e.preventDefault(); selectTab(n, true); }
+    });
+  });
+
+  // 導覽列目前區塊
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a'));
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        links.forEach(function (a) {
+          a.toggleAttribute('aria-current', a.getAttribute('href') === '#' + en.target.id);
+          if (a.hasAttribute('aria-current')) a.setAttribute('aria-current', 'true');
+        });
+      });
+    }, { rootMargin: '-40% 0px -55% 0px' });
+    ['stack', 'work', 'automation', 'projects'].forEach(function (id) {
+      var el = document.getElementById(id); if (el) io.observe(el);
+    });
+  }
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+})();
+</script>
+</body>
+</html>
